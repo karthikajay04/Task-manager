@@ -6,3 +6,4 @@
 
 .search{position:relative;margin-left:auto}.search span{position:absolute;left:10px;top:7px;color:#93a09e;font-size:17px}.search input{width:185px;border:1px solid #e2d8cb;border-radius:18px;background:#fffdf8;padding:7px 10px 7px 30px;outline-color:#e99075;font-size:12px}@media(max-width:720px){.list-head{align-items:flex-end;flex-wrap:wrap}.search{order:3;width:100%;margin:0 0 10px}.search input{width:100%}}
 .sort{font:11px 'DM Mono';color:#839092;white-space:nowrap}.sort select{border:0;border-bottom:1px dashed #cfc3b2;background:transparent;color:#566568;font:11px 'DM Mono';padding:3px;outline-color:#e99075}
+.due.overdue{color:#c56851;font-weight:500}.due:not(.overdue){color:#68877b}
