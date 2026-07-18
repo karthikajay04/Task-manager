@@ -24,9 +24,10 @@ type Filter = 'all' | 'open' | 'done' | 'today';
     </section>
   </section>
   @if (showComposer()) { <div class="modal-backdrop" (click)="closeComposer()"><section class="composer" (click)="$event.stopPropagation()"><button class="close" (click)="closeComposer()">×</button><p class="eyebrow">{{ editing() ? 'EDIT NOTE' : 'A FRESH NOTE' }}</p><h2>{{ editing() ? 'Refine this task' : 'What needs your attention?' }}</h2><form (ngSubmit)="save()"><label>Task<input [(ngModel)]="draft.title" name="title" placeholder="e.g. Send the project update" required autofocus></label><label>A little more context <textarea [(ngModel)]="draft.notes" name="notes" rows="3" placeholder="Add a note, if it helps…"></textarea></label><div class="form-grid"><label>Category<select [(ngModel)]="draft.category" name="category"><option>Personal</option><option>Work</option><option>Study</option><option>Health</option></select></label><label>Due date<input [(ngModel)]="draft.dueDate" name="dueDate" type="date"></label></div><fieldset><legend>Priority</legend>@for (level of priorities; track level) { <button type="button" [class.selected]="draft.priority === level" [class]="level" (click)="draft.priority = level">{{ level }}</button> }</fieldset><div class="composer-actions">@if (editing()) { <button type="button" class="delete" (click)="remove()">Delete task</button> }<button class="primary" [disabled]="saving()">{{ saving() ? 'Saving…' : editing() ? 'Save changes' : 'Add to my list' }}</button></div></form></section></div> }
+  @if (notice()) { <div class="toast" role="status">✦ {{ notice() }}</div> }
 </main>` })
 export class DashboardComponent implements OnInit {
-  tasks = signal<Task[]>([]); filter = signal<Filter>('all'); search = signal(''); searchTerm = ''; sortBy = signal<'created' | 'due' | 'priority'>('created'); showComposer = signal(false); editing = signal<Task | null>(null); saving = signal(false); today = new Date(); priorities: TaskDraft['priority'][] = ['low', 'medium', 'high'];
+  tasks = signal<Task[]>([]); filter = signal<Filter>('all'); search = signal(''); searchTerm = ''; sortBy = signal<'created' | 'due' | 'priority'>('created'); showComposer = signal(false); editing = signal<Task | null>(null); saving = signal(false); notice = signal(''); today = new Date(); priorities: TaskDraft['priority'][] = ['low', 'medium', 'high'];
   draft: TaskDraft = this.newDraft();
   visibleTasks = computed(() => {
     const query = this.search().trim().toLowerCase();
@@ -50,9 +51,10 @@ export class DashboardComponent implements OnInit {
   openComposer() { this.editing.set(null); this.draft = this.newDraft(); this.showComposer.set(true); }
   closeComposer() { this.showComposer.set(false); }
   edit(task: Task) { this.editing.set(task); this.draft = { title: task.title, notes: task.notes, category: task.category, priority: task.priority, dueDate: task.dueDate?.slice(0, 10), completed: task.completed }; this.showComposer.set(true); }
-  save() { this.saving.set(true); const active = this.editing(); const request = active ? this.taskApi.update(active._id, this.draft) : this.taskApi.create(this.draft); request.subscribe({ next: t => { this.tasks.update(list => active ? list.map(x => x._id === t._id ? t : x) : [t, ...list]); this.closeComposer(); this.saving.set(false); }, error: () => this.saving.set(false) }); }
-  toggleTask(task: Task) { this.taskApi.update(task._id, { completed: !task.completed }).subscribe(updated => this.tasks.update(list => list.map(t => t._id === updated._id ? updated : t))); }
+  save() { this.saving.set(true); const active = this.editing(); const request = active ? this.taskApi.update(active._id, this.draft) : this.taskApi.create(this.draft); request.subscribe({ next: t => { this.tasks.update(list => active ? list.map(x => x._id === t._id ? t : x) : [t, ...list]); this.closeComposer(); this.saving.set(false); this.showNotice(active ? 'Your note has been refreshed.' : 'A fresh task has joined your page.'); }, error: () => this.saving.set(false) }); }
+  toggleTask(task: Task) { this.taskApi.update(task._id, { completed: !task.completed }).subscribe(updated => { this.tasks.update(list => list.map(t => t._id === updated._id ? updated : t)); this.showNotice(updated.completed ? 'A little win, nicely done.' : 'Task moved back to your list.'); }); }
   remove() { const task = this.editing(); if (task && confirm('Remove this task from your notebook?')) this.taskApi.delete(task._id).subscribe(() => { this.tasks.update(list => list.filter(t => t._id !== task._id)); this.closeComposer(); }); }
   logout() { this.auth.logout(); location.assign('/login'); }
+  private showNotice(message: string) { this.notice.set(message); setTimeout(() => this.notice.set(''), 3200); }
   private newDraft(): TaskDraft { return { title: '', notes: '', category: 'Personal', priority: 'medium', dueDate: '', completed: false }; }
 }
