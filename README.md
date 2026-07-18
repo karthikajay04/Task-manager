@@ -8,26 +8,14 @@ TaskFlow is a full-stack, responsive task management application built using the
 ---
 
 ## Table of Contents
-1. [Assignment Requirements Checklist](#assignment-requirements-checklist)
-2. [Key Features](#key-features)
-3. [Tech Stack](#tech-stack)
-4. [Project Structure](#project-structure)
-5. [Setup & Installation Instructions](#setup--installation-instructions)
-6. [API Endpoints](#api-endpoints)
-7. [AI Tools Used & Collaboration Breakdown](#ai-tools-used--collaboration-breakdown)
-8. [Challenges Faced & Solutions](#challenges-faced--solutions)
-9. [Future Roadmap & Potential Improvements](#future-roadmap--potential-improvements)
-
----
-
-## Assignment Requirements Checklist
-
-- [x] **Authentication**: Secure registration and login flow using bcryptjs for password hashing and JSON Web Tokens (JWT) for stateless sessions.
-- [x] **CRUD Operations**: Secure task management where all CRUD operations are scoped to the authenticated user.
-- [x] **Responsive UI**: Custom CSS media queries, fluid layouts, and flexbox grids built to display beautifully on desktop, tablet, and mobile browsers.
-- [x] **Clean Project Structure**: Separated client-server folder model, component modularization, and service-based architecture.
-- [x] **Proper Git Commits**: Logical, structured commits tracking development increments.
-- [x] **Comprehensive README**: Providing setup details, AI tool credits, challenge logs, and future visions.
+1. [Key Features](#key-features)
+2. [Tech Stack](#tech-stack)
+3. [Project Structure](#project-structure)
+4. [Setup & Installation Instructions](#setup--installation-instructions)
+5. [API Endpoints](#api-endpoints)
+6. [AI Tools Used & Collaboration Breakdown](#ai-tools-used--collaboration-breakdown)
+7. [Challenges Faced & Solutions](#challenges-faced--solutions)
+8. [Future Roadmap & Potential Improvements](#future-roadmap--potential-improvements)
 
 ---
 
