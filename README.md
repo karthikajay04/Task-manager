@@ -2,6 +2,9 @@
 
 TaskFlow is a full-stack, responsive task management application built using the modern MEAN stack (**MongoDB, Express.js, Angular 19, and Node.js**). Unlike typical dark-themed dashboard applications, TaskFlow's visual theme is inspired by a classic, friendly ruled-paper notebook with colorful sticky notes, bringing a tactile, cozy feeling to task organization.
 
+* **Live Demo:** [https://task-manager-rho-dusky.vercel.app/](https://task-manager-rho-dusky.vercel.app/)
+* **GitHub Repository:** [https://github.com/karthikajay04/Task-manager](https://github.com/karthikajay04/Task-manager)
+
 ---
 
 ## Table of Contents
