@@ -4,4 +4,4 @@ import { isDevMode } from '@angular/core';
 // In production, we point directly to the deployed backend URL.
 export const API_URL = isDevMode()
   ? ''
-  : 'https://taskflow-server-karthik.onrender.com'; // We will update this with your actual deployed Render URL
+  : 'https://task-manager-6hh3.onrender.com'; // We will update this with your actual deployed Render URL
