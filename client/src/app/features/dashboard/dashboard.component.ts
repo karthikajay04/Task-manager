@@ -5,13 +5,13 @@ import { AuthService } from '../../core/auth.service';
 import { Task, TaskDraft } from '../../core/models';
 import { TaskService } from '../../core/task.service';
 
-type Filter = 'all' | 'open' | 'done';
+type Filter = 'all' | 'open' | 'done' | 'today';
 @Component({ selector: 'app-dashboard', imports: [FormsModule, DatePipe], template: `
 <main class="app-shell">
   <aside class="sidebar">
     <a class="logo" href="/">task<span>flow</span><i>✦</i></a>
     <div class="profile"><div class="avatar">{{ initials() }}</div><div><strong>{{ auth.user()?.name }}</strong><small>my notebook</small></div></div>
-    <nav><button [class.active]="filter() === 'all'" (click)="filter.set('all')"><span>☷</span> All tasks <b>{{ tasks().length }}</b></button><button [class.active]="filter() === 'open'" (click)="filter.set('open')"><span>○</span> To do <b>{{ openCount() }}</b></button><button [class.active]="filter() === 'done'" (click)="filter.set('done')"><span>✓</span> Completed <b>{{ doneCount() }}</b></button></nav>
+    <nav><button [class.active]="filter() === 'all'" (click)="filter.set('all')"><span>☷</span> All tasks <b>{{ tasks().length }}</b></button><button [class.active]="filter() === 'today'" (click)="filter.set('today')"><span>☀</span> Today <b>{{ todayCount() }}</b></button><button [class.active]="filter() === 'open'" (click)="filter.set('open')"><span>○</span> To do <b>{{ openCount() }}</b></button><button [class.active]="filter() === 'done'" (click)="filter.set('done')"><span>✓</span> Completed <b>{{ doneCount() }}</b></button></nav>
     <div class="sidebar-foot"><p>“Small steps count.”</p><button class="logout" (click)="logout()">Sign out ↗</button></div>
   </aside>
   <section class="workspace">
@@ -31,21 +31,22 @@ export class DashboardComponent implements OnInit {
   visibleTasks = computed(() => {
     const query = this.search().trim().toLowerCase();
     const results = this.tasks().filter(task => {
-      const correctState = this.filter() === 'all' || (this.filter() === 'done' ? task.completed : !task.completed);
+      const correctState = this.filter() === 'all' || (this.filter() === 'done' ? task.completed : this.filter() === 'today' ? this.isToday(task) : !task.completed);
       return correctState && (!query || `${task.title} ${task.notes} ${task.category}`.toLowerCase().includes(query));
     });
     const priority = { high: 0, medium: 1, low: 2 };
     return [...results].sort((a, b) => this.sortBy() === 'priority' ? priority[a.priority] - priority[b.priority] : this.sortBy() === 'due' ? (a.dueDate || '9999').localeCompare(b.dueDate || '9999') : b.createdAt.localeCompare(a.createdAt));
   });
-  openCount = computed(() => this.tasks().filter(t => !t.completed).length); doneCount = computed(() => this.tasks().filter(t => t.completed).length); progress = computed(() => this.tasks().length ? Math.round(this.doneCount() / this.tasks().length * 100) : 0);
+  openCount = computed(() => this.tasks().filter(t => !t.completed).length); todayCount = computed(() => this.tasks().filter(t => this.isToday(t)).length); doneCount = computed(() => this.tasks().filter(t => t.completed).length); progress = computed(() => this.tasks().length ? Math.round(this.doneCount() / this.tasks().length * 100) : 0);
   constructor(public auth: AuthService, private taskApi: TaskService) {}
   ngOnInit() { this.taskApi.list().subscribe(tasks => this.tasks.set(tasks)); }
   initials() { return this.auth.user()?.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(); }
   greeting() { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
   displayName() { return this.auth.user()?.name.split(' ')[0] || 'friend'; }
   isOverdue(task: Task) { return !task.completed && !!task.dueDate && new Date(task.dueDate).setHours(23, 59, 59, 999) < Date.now(); }
+  isToday(task: Task) { return !!task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString(); }
   dueLabel(task: Task) { const date = new Date(task.dueDate || ''); const today = new Date(); if (date.toDateString() === today.toDateString()) return 'Today'; today.setDate(today.getDate() + 1); if (date.toDateString() === today.toDateString()) return 'Tomorrow'; return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(date); }
-  filterLabel() { return this.filter() === 'all' ? 'Everything on your page' : this.filter() === 'open' ? 'Things to do' : 'Little wins'; }
+  filterLabel() { return this.filter() === 'all' ? 'Everything on your page' : this.filter() === 'today' ? 'A gentle focus for today' : this.filter() === 'open' ? 'Things to do' : 'Little wins'; }
   openComposer() { this.editing.set(null); this.draft = this.newDraft(); this.showComposer.set(true); }
   closeComposer() { this.showComposer.set(false); }
   edit(task: Task) { this.editing.set(task); this.draft = { title: task.title, notes: task.notes, category: task.category, priority: task.priority, dueDate: task.dueDate?.slice(0, 10), completed: task.completed }; this.showComposer.set(true); }
